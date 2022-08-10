@@ -12,6 +12,8 @@ const PATTERN_HASHTAG = /(^|\s)(#[a-z\d-_]+)/gi;
 const PATTERN_MENTION = /(^|\s)(@[a-z\d-_]+)/gi;
 const PATTERN_EMAIL = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi;
 const PATTERN_URL = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
+const PATTERN_SAMUGTAG = /(^|\s)(~[a-z\d-_]+)/gi;
+
 
 const matchesWith = (str, pattern) => {
   let match = null;
@@ -53,6 +55,9 @@ const TwitterTextView = ({
   extractEmails,
   onPressEmail,
   emailStyle,
+  extractSamugtags,
+  onPressSamugtag,
+  samugtagStyle,
   ...extraProps
 }) => {
   const str = (typeof children === "string" && children) || "";
@@ -61,7 +66,8 @@ const TwitterTextView = ({
     !!extractHashtags && PATTERN_HASHTAG,
     !!extractMentions && PATTERN_MENTION,
     !!extractEmails && PATTERN_EMAIL,
-    !!extractLinks && PATTERN_URL
+    !!extractLinks && PATTERN_URL,
+    !!extractSamugtags && PATTERN_SAMUGTAG
   ].filter(e => !!e);
 
   const matches = []
@@ -73,13 +79,15 @@ const TwitterTextView = ({
     [PATTERN_HASHTAG]: onPressHashtag,
     [PATTERN_MENTION]: onPressMention,
     [PATTERN_EMAIL]: onPressEmail,
-    [PATTERN_URL]: onPressLink
+    [PATTERN_URL]: onPressLink,
+    [PATTERN_SAMUGTAG]: onPressSamugtag
   };
   const style = {
     [PATTERN_HASHTAG]: hashtagStyle,
     [PATTERN_MENTION]: mentionStyle,
     [PATTERN_EMAIL]: emailStyle,
-    [PATTERN_URL]: linkStyle
+    [PATTERN_URL]: linkStyle,
+     [PATTERN_SAMUGTAG]: samugtagStyle
   };
 
   return (
@@ -119,7 +127,10 @@ TwitterTextView.propTypes = {
   mentionStyle: textStyleProps,
   extractLinks: PropTypes.bool,
   onPressLink: PropTypes.func,
-  linkStyle: textStyleProps
+  linkStyle: textStyleProps,
+   extractSamugtags:PropTypes.bool,
+  onPressSamugtag:PropTypes.func,
+  samugtagStyletextStyleProps
 };
 
 TwitterTextView.defaultProps = {
@@ -127,6 +138,17 @@ TwitterTextView.defaultProps = {
   extractHashtags: true,
   onPressHashtag: (e, hashtag) => {
     const msg = `Hashtag: "${hashtag}"`;
+    if (Platform.OS !== "web") {
+      Alert.alert(msg);
+    } else {
+      console.log(msg);
+    }
+  },
+  hashtagStyle: styles.linkStyle,
+  
+  extractSamugtags: true,
+  onPressSamugtag: (e, samugtag) => {
+    const msg = `Samugtag: "${samugtag}"`;
     if (Platform.OS !== "web") {
       Alert.alert(msg);
     } else {
